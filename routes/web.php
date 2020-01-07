@@ -18,9 +18,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Auth::routes();
+Auth::routes(['verify' => true]);
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/home', 'HomeController@index')->name('home')->middleware('verified');
 
 
 Route::group(['middleware'=>'admin_guest'],function (){
@@ -35,9 +35,19 @@ Route::group(['middleware'=>'admin_guest'],function (){
 //    });
 });
 
-Route::get('/admin/home', 'Admin\Admin_Guest\AdminController@index')->name('admin.dashboard');
-Route::get('/admin/register', 'Admin\Admin_Auth\AdminRegisterController@index')->name('admin.register');
-Route::get('/admin/login', 'Admin\Admin_Auth\AdminLoginController@index')->name('admin.login');
+
+Route::namespace('Admin')->name('admin.')->prefix('admin')->group(function () {
+    Route::get('/login', 'Admin_Auth\AdminLoginController@showLoginForm')->name('login');
+    Route::post('/login', 'Admin_Auth\AdminLoginController@login')->name('login.post');
+    Route::get('/register', 'Admin_Auth\AdminRegisterController@index')->name('register');
+    Route::post('/register', 'Admin_Auth\AdminRegisterController@store')->name('register.post');
+
+
+});
+
+
+Route::get('/admin/home', 'Admin\Admin_Guest\AdminController@index')->name('admin.dashboard')->middleware('verified');
+//Route::get('/admin/login', 'Admin\Admin_Auth\AdminLoginController@index')->name('admin.login');
 
 
 //Route::group(['middleware'=>'admin_auth'],function (){
